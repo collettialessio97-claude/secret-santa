@@ -1,5 +1,6 @@
-# 🎁 Secret Santa dell'ufficio
-\n🌐 **Sito online:** https://cenanataleaccounteprocessi.netlify.app/ · area organizzatore: `/admin.html`
+# 🎄 Cena di Natale Account e Processi · Secret Santa
+
+🌐 **Sito online:** https://cenanataleaccounteprocessi.netlify.app/ · area organizzatore: `/admin.html`
 
 Ognuno sceglie il proprio nome, imposta un PIN di 4 cifre, scarta il pacco e scopre a chi fa il regalo.
 Può anche lasciare un messaggio con qualche indizio per il proprio Babbo Natale segreto.
