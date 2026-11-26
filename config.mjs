@@ -51,6 +51,7 @@ export default {
       "🍷 Una bottiglia di vino ogni 4 persone",
       "🥂 Spumante ogni 4 persone",
       "💧 Acqua",
+      "☕ Caffè",
       "🍞 Coperto",
     ],
   },
