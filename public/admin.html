@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex" />
+  <title>Admin · Secret Santa</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@700&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="sky" aria-hidden="true"><div class="aurora a1"></div><div class="aurora a2"></div></div>
+  <main>
+    <div class="card glass admin" style="max-width:640px;margin:6vh auto">
+      <h2>🎅 Area organizzatore</h2>
+      <p class="muted small">Qui vedi chi è entrato e chi ha lasciato un messaggio, ma <strong>non</strong> gli abbinamenti, così la sorpresa resta anche per te.</p>
+      <form id="login">
+        <input type="password" id="key" placeholder="Chiave admin (ADMIN_KEY)" autocomplete="current-password" />
+        <button class="btn primary" style="width:100%">Entra</button>
+      </form>
+      <p class="error" id="err"></p>
+      <div id="panel" hidden>
+        <p id="summary"></p>
+        <table>
+          <thead><tr><th>Nome</th><th>Entrato</th><th>Messaggio</th><th></th></tr></thead>
+          <tbody id="rows"></tbody>
+        </table>
+        <hr style="border:0;border-top:1px solid rgba(255,255,255,.1);margin:24px 0" />
+        <p class="muted small">⚠️ <strong>Rifai estrazione</strong> cancella abbinamenti, PIN e messaggi di tutti. Usala solo se hai cambiato i partecipanti.</p>
+        <button class="btn ghost" id="redo">Rifai estrazione</button>
+      </div>
+    </div>
+  </main>
+  <div class="toast" id="toast"></div>
+  <script>
+    const $ = (s) => document.querySelector(s);
+    let key = sessionStorage.getItem("santa-admin") || "";
+    const toast = (m) => { const t = $("#toast"); t.textContent = m; t.classList.add("show"); setTimeout(() => t.classList.remove("show"), 2500); };
+    async function call(path, body) {
+      const r = await fetch("/api" + path, { method: body ? "POST" : "GET", headers: { "x-admin-key": key, "content-type": "application/json" }, body: body && JSON.stringify(body) });
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(d.errore || "Errore");
+      return d;
+    }
+    async function load() {
+      try {
+        const d = await call("/admin");
+        sessionStorage.setItem("santa-admin", key);
+        $("#err").textContent = "";
+        $("#login").hidden = true; $("#panel").hidden = false;
+        const n = d.partecipanti.filter((p) => p.entrato).length;
+        $("#summary").innerHTML = `${d.estrazioneValida ? "✅ Estrazione attiva" : d.estrazioneFatta ? "⚠️ Partecipanti cambiati: rifai l'estrazione" : "⏳ Estrazione non ancora fatta (partirà al primo accesso)"} · <strong>${n}/${d.partecipanti.length}</strong> entrati`;
+        const tb = $("#rows"); tb.innerHTML = "";
+        d.partecipanti.forEach((p) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `<td></td><td>${p.entrato ? "✅" : "—"}</td><td>${p.indizio ? "💌" : "—"}</td><td></td>`;
+          tr.cells[0].textContent = p.nome;
+          if (p.entrato) {
+            const b = document.createElement("button");
+            b.className = "btn ghost small"; b.textContent = "Reset PIN";
+            b.onclick = async () => { if (!confirm(`Resettare il PIN di ${p.nome}? Potrà sceglierne uno nuovo (il messaggio resta).`)) return; await call("/admin/reset-pin", { nome: p.nome }); toast("PIN resettato"); load(); };
+            tr.cells[3].appendChild(b);
+          }
+          tb.appendChild(tr);
+        });
+      } catch (e) { $("#err").textContent = e.message; $("#login").hidden = false; $("#panel").hidden = true; }
+    }
+    $("#login").onsubmit = (e) => { e.preventDefault(); key = $("#key").value; load(); };
+    $("#redo").onclick = async () => {
+      if (prompt('Scrivi RIFAI per confermare. Tutti dovranno rientrare e riscrivere i messaggi.') !== "RIFAI") return;
+      try { await call("/admin/rifai-estrazione", { conferma: "RIFAI" }); toast("Nuova estrazione fatta 🎲"); load(); } catch (e) { toast(e.message); }
+    };
+    if (key) load();
+  </script>
+</body>
+</html>

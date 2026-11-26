@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Secret Santa 🎁</title>
+  <meta name="theme-color" content="#04163a" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎁</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,700;1,9..144,500;1,9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Caveat:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Sfondo animato -->
+  <div class="sky" aria-hidden="true">
+    <div class="aurora a1"></div><div class="aurora a2"></div><div class="aurora a3"></div>
+  </div>
+  <canvas id="snow" aria-hidden="true"></canvas>
+  <svg class="hills" viewBox="0 0 1440 220" preserveAspectRatio="none" aria-hidden="true">
+    <defs>
+      <linearGradient id="h1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#cfe2ff"/><stop offset="1" stop-color="#8fb4ef"/></linearGradient>
+      <linearGradient id="h2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#d9e8ff"/></linearGradient>
+    </defs>
+    <path fill="url(#h1)" opacity=".55" d="M0 120 C 200 40, 380 60, 560 110 S 920 30, 1120 90 S 1360 70, 1440 100 V220 H0Z"/>
+    <path fill="url(#h2)" d="M0 170 C 240 110, 420 130, 640 165 S 1020 110, 1240 150 S 1400 140, 1440 150 V220 H0Z"/>
+  </svg>
+  <canvas id="confetti" aria-hidden="true"></canvas>
+
+  <main id="app">
+    <!-- ================= HOME ================= -->
+    <section id="screen-home" class="screen active">
+      <header class="hero">
+        <span class="pill"><span class="pill-dot"></span>🎄 <span id="anno">2026</span></span>
+        <h1><span id="titolo">Cena di Natale</span><br /><em id="ufficio">Account e Processi</em></h1>
+        <p class="lead hero-when"><strong id="hero-when"></strong><span id="hero-where"></span></p>
+
+        <div class="countdown glass" id="countdown">
+          <div><strong id="cd-d">--</strong><span>giorni</span></div>
+          <div><strong id="cd-h">--</strong><span>ore</span></div>
+          <div><strong id="cd-m">--</strong><span>minuti</span></div>
+          <div><strong id="cd-s">--</strong><span>secondi</span></div>
+        </div>
+      </header>
+
+      <!-- ===== Il locale ===== -->
+      <section class="event" id="event" hidden>
+        <div class="card glass event-card">
+          <div class="event-head">
+            <div class="event-info">
+              <span class="event-kicker">🍽️ Il locale</span>
+              <h3 class="ev-name"></h3>
+              <div class="ev-extra"></div>
+              <p class="ev-when"></p>
+              <p class="ev-addr muted"></p>
+              <p class="ev-note muted small"></p>
+            </div>
+            <div class="ev-actions">
+              <a class="btn primary ev-maps" target="_blank" rel="noopener">📍 Portami lì</a>
+              <button class="btn ghost ev-cal" type="button">🗓️ Aggiungi al calendario</button>
+              <a class="btn ghost ev-tel" hidden>📞 Chiama il locale</a>
+            </div>
+          </div>
+
+          <div class="tabs" role="tablist">
+            <button class="tab active" role="tab" aria-selected="true" data-tab="menu" id="tabbtn-menu">📖 Il menù</button>
+            <button class="tab" role="tab" aria-selected="false" data-tab="dirs">🧭 Come arrivare</button>
+            <span class="tab-indicator" aria-hidden="true"></span>
+          </div>
+
+          <div class="tab-panel active" id="tab-menu" role="tabpanel">
+            <div class="menu-card" id="menu">
+              <div class="menu-inner">
+                <span class="menu-kicker">Menù della serata</span>
+                <h3>✦ A tavola! ✦</h3>
+                <div class="menu-courses"></div>
+                <div class="menu-divider">❄</div>
+                <ul class="menu-incl"></ul>
+                <div class="menu-price"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-panel" id="tab-dirs" role="tabpanel">
+            <div class="dirs-grid">
+              <ul class="ev-dirs"></ul>
+              <iframe class="ev-map" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Mappa del locale"></iframe>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== Secret Santa ===== -->
+      <section class="pick" id="secret-santa">
+        <div class="santa-divider" aria-hidden="true"><span></span>🎁<span></span></div>
+        <span class="pill santa-pill">Secret Santa</span>
+        <h2>Chi sarà il tuo <em>destinatario</em>?</h2>
+        <p class="muted santa-lead">Alla cena ci scambiamo i regali! Tocca il <u>tuo</u> nome, scarta il pacco e scopri a chi farai il regalo. Shhh… acqua in bocca 🤫</p>
+        <div class="chips">
+          <span class="chip"><span>💶</span> Budget <strong id="budget">4–10 €</strong></span>
+          <span class="chip"><span>🎄</span> Scambio <strong>alla cena</strong></span>
+        </div>
+        <label class="search">
+          <span aria-hidden="true">🔎</span>
+          <input id="search" type="search" placeholder="Cerca il tuo nome…" autocomplete="off" />
+        </label>
+        <div class="names" id="names">
+          <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
+        </div>
+        <div class="progress">
+          <div class="bar"><span id="progress-bar"></span></div>
+          <p id="progress-text" class="muted small"></p>
+        </div>
+      </section>
+    </section>
+
+    <!-- ================= PIN ================= -->
+    <section id="screen-pin" class="screen">
+      <div class="card glass pin-card">
+        <button class="back" data-back>← Indietro</button>
+        <div class="avatar big" id="pin-avatar"></div>
+        <h2 id="pin-title">Ciao!</h2>
+        <p class="muted" id="pin-sub"></p>
+        <form id="pin-form" autocomplete="off">
+          <div class="pin" id="pin-boxes">
+            <input inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="Cifra 1" />
+            <input inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="Cifra 2" />
+            <input inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="Cifra 3" />
+            <input inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="Cifra 4" />
+          </div>
+          <p class="error" id="pin-error" role="alert"></p>
+          <button class="btn primary" type="submit" id="pin-submit">Continua</button>
+        </form>
+        <p class="muted small" id="pin-hint"></p>
+      </div>
+    </section>
+
+    <!-- ================= REVEAL ================= -->
+    <section id="screen-reveal" class="screen">
+      <div class="reveal-wrap">
+        <p class="reveal-kicker" id="reveal-kicker">Il tuo pacco ti aspetta…</p>
+
+        <div class="stage">
+          <div class="rays"></div>
+          <button class="gift" id="gift" aria-label="Apri il pacco">
+            <span class="gift-lid"><span class="bow"></span></span>
+            <span class="gift-box"></span>
+            <span class="gift-shadow"></span>
+          </button>
+          <div class="result" id="result">
+            <span class="result-label">Farai il regalo a</span>
+            <span class="result-name" id="result-name"></span>
+          </div>
+        </div>
+
+        <p class="tap" id="tap-hint">👆 Tocca il pacco per aprirlo</p>
+      </div>
+
+      <div class="dashboard" id="dashboard">
+        <article class="card letter">
+          <div class="stamp">❄️</div>
+          <h3>💌 Il messaggio di <span class="dest-name"></span> per te</h3>
+          <p class="handwritten" id="dest-hint"></p>
+          <button class="btn ghost small" id="refresh-hint">↻ Aggiorna</button>
+        </article>
+
+        <article class="card glass">
+          <h3>✍️ Lascia un indizio al tuo Babbo Natale segreto</h3>
+          <p class="muted small">Qualcuno ha pescato <strong>te</strong>! Aiutalo con un suggerimento: cosa ti piace, cosa eviteresti… Non sa chi sei? Lui sì 😉</p>
+          <div class="ideas" id="ideas"></div>
+          <textarea id="my-hint" maxlength="300" rows="4" placeholder="Es. Adoro il tè e i calzini colorati, niente profumi per favore!"></textarea>
+          <div class="row">
+            <span class="muted small" id="hint-count">0/300</span>
+            <button class="btn primary" id="save-hint">Salva messaggio</button>
+          </div>
+        </article>
+
+        <article class="card glass reminder">
+          <div>🎁 Budget <strong class="budget-txt"></strong></div>
+          <div>📅 Scambio <strong class="data-txt"></strong></div>
+          <div>🤫 Non dirlo a nessuno!</div>
+        </article>
+
+        <article class="card glass event-mini" id="event-mini" hidden>
+          <div>📍 <strong class="ev-name"></strong><br /><span class="muted small ev-addr"></span></div>
+          <a class="btn ghost small ev-maps" target="_blank" rel="noopener">Indicazioni →</a>
+        </article>
+
+        <button class="btn ghost" id="logout">Esci</button>
+      </div>
+    </section>
+  </main>
+
+  <div class="toast" id="toast" role="status"></div>
+  <script src="app.js"></script>
+</body>
+</html>
