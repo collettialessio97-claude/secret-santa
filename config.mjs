@@ -7,7 +7,7 @@ export default {
 
   // Budget del regalo, in euro
   budgetMin: 4,
-  budgetMax: 10,
+  budgetMax: 8,
 
   // Giorno e ora della cena con lo scambio dei regali (fuso orario italiano: +01:00)
   dataScambio: "2026-12-16T20:00:00+01:00",
