@@ -29,7 +29,6 @@ export default {
 
   // Menù della serata. Le portate con più piatti vengono mostrate "a scelta".
   menu: {
-    prezzo: 30,
     portate: [
       { nome: "Antipasto", piatti: ["Vitello tonnato"] },
       {
